@@ -115,7 +115,7 @@ public:
         {
             if (cmd == this->Commands[i].command)
             {
-                if(!this->Commands[i].allow_no_argument && !this->Commands[i].single_string_arg)
+                if(!this->Commands[i].allow_no_argument && !this->Commands[i].single_string_arg || (!publishedCommand.arguments.empty() && this->Commands[i].allow_no_argument))
                 {
                     // Cek ada berapa parameter
                     if (tokens.size() != this->Commands[i].arg_types.size())
@@ -128,7 +128,7 @@ public:
                     {
                         if (!(check_type(tokens[param_i],this->Commands[i].arg_types[param_i])))
                         {
-                            this->evtSystem->Publish("CMD_EVT_INVALID_ARGTYPE",CommandEvent(this->Commands[i]));
+                            this->evtSystem->Publish("CMD_EVT_INVALID_ARGTYPE",CommandEvent(this->Commands[i],"Argument invalid! parameter " + std::to_string(param_i + 1) + " is of the wrong type!"));
                             return -1;
                         }
                     }

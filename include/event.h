@@ -16,9 +16,9 @@ public:
         return this->id;
     }
     
-    const char* getEvtType () const
+    const std::string getEvtType () const
     {
-        return this->evtType.c_str();
+        return this->evtType;
     }
 };
 

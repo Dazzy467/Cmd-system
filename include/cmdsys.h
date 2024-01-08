@@ -36,6 +36,7 @@ struct Command
     std::string command;
     std::vector<ARG_TYPE> arg_types;
     bool allow_no_argument = false;
+    bool single_string_arg = false;
     std::vector<std::string> arguments;
 };
 
@@ -43,17 +44,24 @@ class CommandEvent : public event
 {
 private:
     Command cmd;
+    std::string message;
 public:
-    CommandEvent(const Command& _cmd,int _id = -1)
+    CommandEvent(const Command& _cmd,const std::string& msg = "Ok",int _id = -1)
     {
         this->id = _id;
         this->cmd = _cmd;
+        this->message = msg;
     }
     
 
     const Command getCmd() const 
     {
         return this->cmd;
+    }
+
+    const char* what() const
+    {
+        return this->message.c_str();
     }
 };
 
@@ -87,6 +95,13 @@ public:
             cmd = tokenizer();
         }
         
+        if (tokens.empty())
+        {
+            this->evtSystem->Publish("CMD_EVT_INVALID_NOTFOUND",CommandEvent(Command({}),"No command entered!"));
+            return -1;
+        }
+
+
         cmd = tokens.at(0); 
         tokens.pop_front();
 
@@ -100,12 +115,12 @@ public:
         {
             if (cmd == this->Commands[i].command)
             {
-                if(!this->Commands[i].allow_no_argument)
+                if(!this->Commands[i].allow_no_argument && !this->Commands[i].single_string_arg)
                 {
                     // Cek ada berapa parameter
                     if (tokens.size() != this->Commands[i].arg_types.size())
                     {
-                        this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i]));
+                        this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i],"Invalid parameter, expecting " + std::to_string(this->Commands[i].arg_types.size()) + ", " + std::to_string(tokens.size()) + " given."));
                         return -1;
                     }
                     // Cek apakah tipe data parameter benar? (Error here)
@@ -118,11 +133,29 @@ public:
                         }
                     }
                 }
+
+                else if (this->Commands[i].single_string_arg)
+                {
+                    if (!tokens.empty())
+                    {
+                        std::string arg_result = str_cmd;
+                        size_t pos = arg_result.find(cmd);
+                        arg_result = arg_result.substr(pos + cmd.length() + 1);
+                        publishedCommand.arguments.clear();
+                        // for(const auto& i : tokens)
+                        //     arg_result += i;
+                        publishedCommand.arguments.push_back(arg_result); 
+                    }
+                    else {
+                        this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i],"Invalid parameter, expecting " + std::to_string(this->Commands[i].arg_types.size()) + ", 0 given."));
+                        return -1;
+                    }
+                }
                 this->evtSystem->Publish("CMD_EVT_PROCESSED",CommandEvent(publishedCommand));
                 return 1;
             }
         }
-        this->evtSystem->Publish("CMD_EVT_INVALID_NOTFOUND",CommandEvent(Command({cmd})));
+        this->evtSystem->Publish("CMD_EVT_INVALID_NOTFOUND",CommandEvent(Command({cmd}),"Command " + cmd + " not found!"));
         return -1;
     }
 };

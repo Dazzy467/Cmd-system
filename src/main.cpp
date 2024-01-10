@@ -10,6 +10,7 @@ public:
     float speed;
     std::string cmd;
     std::vector<Command> commands {
+        {"sum",{ARG_TYPE::ARG_FLOAT,ARG_TYPE::ARG_FLOAT}},
         {"set_speed",{ARG_TYPE::ARG_FLOAT},true},
         {"say",{ARG_TYPE::ARG_STRING},false,true},
         {"exit"}
@@ -32,7 +33,6 @@ public: // Init & Loop
         commandSys = new cmdsys(commands,evtsys,[this](const CommandEvent& e){
             this->commandHandler(e);
         });
-        // cmdsys commandSys(commands,&evtsys,commandHandler);
     }
     // Put this on main loop
     void Loop()
@@ -52,6 +52,11 @@ public: // Handler
             if (e.getCmd().command == "say")
             {
                 std::cout << "You said \"" << e.getCmd().arguments[0] << "\"\n\n";  
+            }
+            else if(e.getCmd().command == "sum")
+            {
+                float sum = std::stof(e.getCmd().arguments[0]) + std::stof(e.getCmd().arguments[1]);
+                std::cout << "The result is " << sum << "\n\n";
             }
             else if(e.getCmd().command == "set_speed")
             {
@@ -76,6 +81,7 @@ public: // Handler
         {
             if (e.getCmd().command == "set_speed")
                 std::cout << e.what() << " expecting type float!" << std::endl;
+            else std::cout << e.what() << std::endl;
         }
         else
         {

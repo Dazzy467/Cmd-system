@@ -120,7 +120,7 @@ public:
                     // Cek ada berapa parameter
                     if (tokens.size() != this->Commands[i].arg_types.size())
                     {
-                        this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i],"Invalid parameter, expecting " + std::to_string(this->Commands[i].arg_types.size()) + ", " + std::to_string(tokens.size()) + " given."));
+                        this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i],"Invalid parameter, expecting " + std::to_string(this->Commands[i].arg_types.size()) + " parameters, " + std::to_string(tokens.size()) + " given."));
                         return -1;
                     }
                     // Cek apakah tipe data parameter benar? (Error here)
@@ -147,7 +147,7 @@ public:
                         publishedCommand.arguments.push_back(arg_result); 
                     }
                     else {
-                        this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i],"Invalid parameter, expecting " + std::to_string(this->Commands[i].arg_types.size()) + ", 0 given."));
+                        this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i],"Invalid parameter, expecting " + std::to_string(this->Commands[i].arg_types.size()) + " parameters, 0 given."));
                         return -1;
                     }
                 }

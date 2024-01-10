@@ -60,5 +60,12 @@
         "cinttypes": "cpp",
         "typeinfo": "cpp",
         "sstream": "cpp"
-    }
+    },
+    "makefile.configurations": [
+        {
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\msys64\\mingw64\\bin\\gdb.exe",
+            "name": "Unnamed configuration 1"
+        }
+    ]
 }

@@ -136,19 +136,23 @@ public:
 
                 else if (this->Commands[i].single_string_arg)
                 {
-                    if (!tokens.empty())
+                    if (!this->Commands[i].allow_no_argument)
                     {
-                        std::string arg_result = str_cmd;
-                        size_t pos = arg_result.find(cmd);
-                        arg_result = arg_result.substr(pos + cmd.length() + 1);
-                        publishedCommand.arguments.clear();
-                        // for(const auto& i : tokens)
-                        //     arg_result += i;
-                        publishedCommand.arguments.push_back(arg_result); 
-                    }
-                    else {
-                        this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i],"Invalid parameter, expecting " + std::to_string(this->Commands[i].arg_types.size()) + " parameters, 0 given."));
-                        return -1;
+                        if (!tokens.empty())
+                        {
+                            std::string arg_result = str_cmd;
+                            size_t pos = arg_result.find(cmd);
+                            arg_result = arg_result.substr(pos + cmd.length() + 1);
+                            publishedCommand.arguments.clear();
+                            // for(const auto& i : tokens)
+                            //     arg_result += i;
+                            publishedCommand.arguments.push_back(arg_result); 
+                        }
+                        
+                        else {
+                            this->evtSystem->Publish("CMD_EVT_INVALID_ARG",CommandEvent(this->Commands[i],"Invalid parameter, expecting " + std::to_string(this->Commands[i].arg_types.size()) + " parameters, 0 given."));
+                            return -1;
+                        }
                     }
                 }
                 this->evtSystem->Publish("CMD_EVT_PROCESSED",CommandEvent(publishedCommand));
